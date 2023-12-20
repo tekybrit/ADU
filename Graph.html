@@ -173,8 +173,8 @@
           <button id = "fastBack" onclick = "move(7)">&#60;&#60;</button>
           <button id = "Back" onclick = "move(1)">&nbsp;&#60;&nbsp;</button>
           <li></li>
-          <button id = "Months" onclick = "changeTo('Months')">Months</button>
-          <button id = "Days" style = "background-color:rgba(0, 100, 0, 0.6)" onclick = "changeTo('Days')">Days</button>
+          <button id = "Months" style = "background-color:rgba(0, 100, 0, 0.6)" onclick = "changeTo('Months')">Months</button>
+          <button id = "Days" onclick = "changeTo('Days')">Days</button>
           <button id = "Hours" onclick = "changeTo('Hours')">Hrs</button>
           <li></li>
           <button id = "Fwd" onclick = "move(-1)">&nbsp;&#62;&nbsp;</button>
@@ -208,8 +208,8 @@
       var yri = 1;
       var btn = 'Months';
 
-      var offPeakPrice = .48;                         // PG&E off peak price
-      var peakPrice = .52;                            // PG&E peak price
+      var offPeakPrice = .40827;                         // PG&E off peak price
+      var peakPrice = .43662;                            // PG&E peak price
       var offPeakDayUse = 0;    // day off peak Kwh
       var PeakDayUse = 0;       // day peak Kwh
       var dayUse = 0;           // day total Kwh
@@ -229,7 +229,7 @@
         topic = "Rix/ADU";
         document.getElementById("mess").innerHTML = "Subscribing to topic " + topic;
         client.subscribe(topic);
-        changeTo("Days");
+        changeTo("Months");
       }
 
       function startConnect(){
@@ -311,7 +311,7 @@
                         data.datasets[0].data[n] = obj[key] / 800;
                       else
                         data.datasets[1].data[n] = obj[key] / 800;
-                      data.labels[n] = dows.slice(0,3) + " " + domi + " " + month[ moi ].slice(0,3) + " " + yri;
+                      data.labels[n] = dows.slice(0,3) + " " + domi + " " + month[ moi ].slice(0,3) + ( ( yri < 10 ) ? ' 0' : ' ' ) + yri;
                     }
                   else if ( key[0] == "o" || key[0] == "p" )                      // Months
                     {
@@ -321,7 +321,7 @@
                         data.datasets[1].data[n] = obj[key] / 800;
                       data.labels[n] = month[ moi ].slice(0,3) + ( ( yri < 10 ) ? " 200" : " 20" ) + yri;
                     }
-                  if ( n == 23 )
+                  if ( n == 0 )
                     {
                       var myTable = document.getElementById('dayHr');
                       if ( btn == "Hours")
@@ -329,6 +329,7 @@
                           //document.getElementById("mess").innerText = "$" + offPeakPrice.toFixed(3) + "/Kwh   $" + peakPrice.toFixed(3) + "/Kwh";
                           //document.getElementById("mess").style.textAlign = "center";
                           //document.getElementById("mess").style.webkitTextFillColor = "blue";
+                          myTable.rows[0].cells[0].style.textAlign = "left";
                           dayText = dows.slice(0,3) + ' ' + domi + ' ' + month[ moi ].slice(0,3) + ' ' + yri;
                           myTable.rows[0].cells[0].innerHTML = dayText;
                           myTable.rows[0].cells[3].innerHTML = 'Kwh';
@@ -337,13 +338,14 @@
                       else if ( btn == "Days")
                         {
                           document.getElementById("mess").innerText = " ";
+                          myTable.rows[0].cells[0].style.textAlign = "center";
                           myTable.rows[0].cells[0].innerHTML = 'Day';
                           myTable.rows[0].cells[3].innerHTML = 'Total';
                         }
                       else
                         {
                           document.getElementById("mess").innerText = " ";
-                          myTable.rows[0].cells[0].style.textAlign = "left";
+                          myTable.rows[0].cells[0].style.textAlign = "center";
                           myTable.rows[0].cells[0].innerHTML = 'Month';
                           myTable.rows[0].cells[1].style.backgroundColor = 'rgba(0, 220, 0, 0.6)'; // sort of green
                           myTable.rows[0].cells[2].style.backgroundColor = 'rgba(220, 0, 0, 0.6)'; // sort of red
@@ -396,9 +398,9 @@
       function move(v) {
         back += v;
         if ( back < 0 ) back = 0;
-        if ( btn == 'Month' )
+        if ( btn == 'Months' )
           {
-            if ( back > 18 )
+            if ( back > 18 )      // limit to 20 years including this year and last year
               back = 18;
           }
         if ( btn == 'Days' )
@@ -408,7 +410,7 @@
           }
         if ( btn == 'Hours' )
           {
-            if ( back > 61 )
+            if ( back > 61 )      // limit to 62 days including today
               back = 61;
           }
         publishMessage( btn + back );
