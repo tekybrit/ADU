@@ -133,7 +133,7 @@
       }
 
       button {
-        padding: 3px;
+        padding: 4px;
         border-Width: 1px;
         border-Color: rgba(0, 200, 0, 1);
         border-radius: 8px;
@@ -143,15 +143,9 @@
         position:relative; left:7px; bottom:5px;
       }
 
-      li {
-        display: inline-block;
-        margin: 0 3px;
-        font-size: 18px;
-        position:relative; left:7px; bottom:9px;
-      }
-
       td {
         text-align: center;
+        width: 30%;
       }
 
     </style>
@@ -169,29 +163,24 @@
     -->
     <div class = "chartCard">
       <div class = "chartBox">
-        <ul>  
-          <button id = "fastBack" onclick = "move(7)">&#60;&#60;</button>
-          <button id = "Back" onclick = "move(1)">&nbsp;&#60;&nbsp;</button>
-          <li></li>
-          <button id = "Months" style = "background-color:rgba(0, 100, 0, 0.6)" onclick = "changeTo('Months')">Months</button>
-          <button id = "Days" onclick = "changeTo('Days')">Days</button>
-          <button id = "Hours" onclick = "changeTo('Hours')">Hrs</button>
-          <li></li>
-          <button id = "Fwd" onclick = "move(-1)">&nbsp;&#62;&nbsp;</button>
-          <button id = "fastFwd" onclick = "move(-7)">&#62;&#62;</button>
-          <li></li>
-          <li></li>
-          <button id = "Cost" onclick = "make('Cost')">Kwh</button>
-          </ul>
-          <pre id = "mess">Press Month, Day or Hrs button</pre>
-          <table id = "dayHr" >
-            <tr>
-              <td style="width: 37%" >Date</td>
-              <td style="width: 25%" >Regular</td>
-              <td style="width: 25%" >Peak</td>
-              <td style="width: 13%" >Total</td>
-            </tr>
-          </table>
+        <button type="button" id = "fastBack" onclick = "move(7)">&#60;&#60;</button>
+        <button type="button" id = "Back" onclick = "move(1)">&nbsp;&#60;&nbsp;</button>
+        &nbsp; 
+        <button type="button" id = "Months" onclick = "changeTo('Months')">Months</button>
+        <button type="button" id = "Days" onclick = "changeTo('Days')">Days</button>
+        <button type="button" id = "Hours" onclick = "changeTo('Hours')">Hours</button>
+        &nbsp; 
+        <button type="button" id = "Fwd" onclick = "move(-1)">&nbsp;&#62;&nbsp;</button>
+        <button type="button" id = "fastFwd" onclick = "move(-7)">&#62;&#62;</button>
+        &nbsp; &nbsp; 
+        <button type="button" id = "Cost" onclick = "make('Cost')">Kwh</button>
+        <pre id = "mess">Press Month, Day or Hrs button</pre>
+        <table id = "dayHr" >
+          <td>Date</td>
+          <td>Off Peak</td>
+          <td>Peak</td>
+          <td>Total</td>
+        </table>
         <canvas id = "myChart"></canvas>
       </div>
     </div>
@@ -221,8 +210,8 @@
       var back = 0;
       var dayText = "";
 
-      const dow = ["ZERO","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","err7","err8","err9","err10","err11","err12"];
-      const month = ["January","February","March","April","May","June","July","August","September","October","November","December","m12","m13","m14","m15"];
+      const dow = ["ZERO","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
       function onConnect() {
         console.log("Connected ");
@@ -230,6 +219,7 @@
         document.getElementById("mess").innerHTML = "Subscribing to topic " + topic;
         client.subscribe(topic);
         changeTo("Months");
+        document.getElementById("Months").style.backgroundColor = "rgba(0, 220, 0, 0.6)";
       }
 
       function startConnect(){
@@ -427,7 +417,7 @@
         labels: [],
         datasets: [
           {
-          label: 'Regular ',
+          label: 'Off Peak ',
           data: [],
           backgroundColor: this.fill = ( 'rgba(0, 220, 0, 0.6)' ),
           borderColor: this.fill = ( 'rgba(0, 240, 0, 1)' ),
@@ -486,7 +476,7 @@
             } )
       }
     }
-    const PGE = () => { return [ ' ', 'Regular $' + offPeakPrice + '/Kwh', ' ', ' Peak  $' + peakPrice + '/Kwh']; };
+    const PGE = () => { return [ ' ', 'Off Peak $' + offPeakPrice + '/Kwh', ' ', ' Peak  $' + peakPrice + '/Kwh']; };
 
     const config = {        // config 
       type: 'bar',
