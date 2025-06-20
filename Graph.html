@@ -2,10 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js" type="text/javascript"></script>
     <script type = "text/javascript" src = "https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
-    <title>POOL HOUSE E METER</title>
+
+    <title>COTTAGE ELECTRIC METER</title>
     <style>
       * {
         margin: 0;
@@ -16,7 +18,12 @@
       body {
         font-family: "Open Sans", sans-serif;
       }
-      
+
+      .brhalf { 
+        display: block; 
+        margin-bottom: 8px; 
+      }
+
       pre {
         font-size: 18px;
         text-align: left;
@@ -80,26 +87,19 @@
       #messages {
         margin-top: 12px;
         margin-bottom: 12px;
-        padding: 12px;
-        width:65%;
+        padding: 1px;
+        width:100%;
         /* display: right; showed error in console ??? */
         border:1px solid black;
         max-height: 50px;
         min-height: 50px;
         overflow: scroll;
-        position:absolute; left:31%; top:0px;
+        position:absolute; left:0%; top:0px;
       }
 
       #messages span {
         overflow-y: scroll;
         overflow: scroll;
-      }
-
-      table {
-        font-family: arial, sans-serif;
-        border-collapse: collapse;
-        font-size: 18px;
-        width: 90%;
       }
 
       .chartMenu {
@@ -116,99 +116,113 @@
 
       .chartCard {
         width: 100vw;
-        height: calc( 98vh - 10px );
+        height: calc( 95vh );
         background: rgba(54, 162, 235, 0.2);
         display: flex;
-        /* align-items: left; showed error in console ??? */
         justify-content: left;
       }
 
       .chartBox {
-        height: 90%;
-        width: 95%;
-        padding: 20px;
-        /* border-radius: 20px;
-        border: solid 3px rgba(0, 255, 255, 1);
-        background:rgb(195, 225, 235); */
+        height: calc( 88vh - 100px );
+        width: 100%;
+        padding: 10px;
+      }
+
+      #buttonGroup {
+        font-size: 0;
       }
 
       button {
         padding: 4px;
         border-Width: 1px;
-        border-Color: rgba(0, 200, 0, 1);
-        border-radius: 8px;
+        border-Color: rgba(80, 80, 80, 1);
         cursor: pointer;
-        background-color: rgb( 176, 240, 176);
+        background-color: '#ffb';
         font-size: 18px;
-        position:relative; left:7px; bottom:5px;
+        position:relative; top:15px;
+      }
+
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        font-size: 18px;
+        width: 95%;
+        height: 3.5%;
       }
 
       td {
         text-align: center;
-        width: 30%;
       }
 
     </style>
   </head>
   <body>
-    <!--
-    <div class="wrapper">
-      <form id="connection-information-form">
-        <div id="messages"></div><br>
-          <input type="button" style = "width:8.5%" onclick="startDisconnect()" value="Disconnect">
-        <br>
-        <input id="Message" type="text" name="message" value="Day1"><br>  placeholder="Day1" 
-        </form>
-    </div>
-    -->
     <div class = "chartCard">
       <div class = "chartBox">
-        <button type="button" id = "fastBack" onclick = "move(7)">&#60;&#60;</button>
-        <button type="button" id = "Back" onclick = "move(1)">&nbsp;&#60;&nbsp;</button>
-        &nbsp; 
-        <button type="button" id = "Months" onclick = "changeTo('Months')">Months</button>
-        <button type="button" id = "Days" onclick = "changeTo('Days')">Days</button>
-        <button type="button" id = "Hours" onclick = "changeTo('Hours')">Hours</button>
-        &nbsp; 
-        <button type="button" id = "Fwd" onclick = "move(-1)">&nbsp;&#62;&nbsp;</button>
-        <button type="button" id = "fastFwd" onclick = "move(-7)">&#62;&#62;</button>
-        &nbsp; &nbsp; 
-        <button type="button" id = "Cost" onclick = "make('Cost')">Kwh</button>
         <pre id = "mess">Press Month, Day or Hrs button</pre>
         <table id = "dayHr" >
-          <td>Date</td>
-          <td>Off Peak</td>
-          <td>Peak</td>
-          <td>Total</td>
+          <td width="22%">Date</td>
+          <td width="18%">Off Peak</td>
+          <td width="18%">Partial</td>
+          <td width="18%">Peak</td>
+          <td width="18%">&nbsp;Total</td>
         </table>
         <canvas id = "myChart"></canvas>
+        <span class="brhalf"></span>
+        <table id = "Totals" >
+          <td width="22%">Totals</td>
+          <td width="18%">Off</td>
+          <td width="18%">Partial</td>
+          <td width="18%">Peak</td>
+          <td width="18%">Total</td>
+        </table>
+        <div id="buttonGroup"> 
+          <button type="button" id = "space0">s</button>
+          <button type="button" id = "fastBack" onclick = "move(7)">&#60;&#60;</button>
+          <button type="button" id = "Back" onclick = "move(1)">&nbsp;&#60;&nbsp;</button>
+          <button type="button" id = "space1">s</button>
+          <button type="button" id = "Month" onclick = "move('Month')">Month</button>
+          <button type="button" id = "Day" onclick = "move('Day')">Day</button>
+          <button type="button" id = "space2">s</button> 
+          <button type="button" id = "Fwd" onclick = "move(-1)">&nbsp;&#62;&nbsp;</button>
+          <button type="button" id = "fastFwd" onclick = "move(-7)">&#62;&#62;</button>
+          <button type="button" id = "space3">s</button> 
+          <button type="button" id = "Cost" onclick = "make('Cost')">&nbsp;$&nbsp;</button>
+          <button type="button" id = "Kwh"  onclick = "make('Kwh')" >Kwh</button>
+        </div>
       </div>
     </div>
     <script type = "text/javascript" language = "javascript">
 
-      var mqtt;
-      var reconnectTimeout = 2000;
-      var host = "192.168.4.85";
-      var port = 9001;
+      const reconnectTimeout = 2000;
+      const host = "192.168.4.85";
+      const port = 9001;
 
-      var dows = "Not Initialized";
+      const color0 = 'rgba( 200, 255, 200, 1 )';    // light green
+      const color1 = 'rgba( 0, 240, 0, 1 )';        // green
+      const color2 = 'rgba( 240, 220, 0, 0.5 )';    // yellow
+      const color3 = 'rgba( 255, 0, 0, 0.5 )';      // red
+
+      const price = [ { day: 241001, op: .34831, pp: .36217, pk: .38426 },          // use price[n].day to access
+                      { day: 241101, op: .34831, pp: .36217, pk: .38426 },          // use price[n].op to access
+                      { day: 241201, op: .34831, pp: .36217, pk: .38426 },          // use price[n].pp to access
+                      { day: 250101, op: .34831, pp: .36217, pk: .38426 } ];        // use price[n].pk to access
+      var priceOP = new Array();
+      var pricePP = new Array();
+      var pricePK = new Array();
+      var viewDay = 240101;
+      var dows = "Day of the Week String";
       var domi = 1;
       var moi = 1;
       var yri = 1;
-      var btn = 'Months';
+      var btn = 'Month';
 
-      var offPeakPrice = .40827;                         // PG&E off peak price
-      var peakPrice = .43662;                            // PG&E peak price
-      var offPeakDayUse = 0;    // day off peak Kwh
-      var PeakDayUse = 0;       // day peak Kwh
-      var dayUse = 0;           // day total Kwh
-      var dayOffPeakCost = 0;   // day off peak cost
-      var dayPeakCost = 0;      // day peak cost
-      var dayCost = 0;          // day total cost
-      var cost = true;
-      var btn = "Months";
+      let UsedOP = 0, UsedPP = 0, UsedPK = 0;   // off peak, partial peak & peak Kwh
+      let CostOP = 0, CostPP = 0, CostPK = 0;   // off peak, partial peak & peak cost
+      var dollar = true;  // display in dollars or Kwhs
       var back = 0;
-      var dayText = "";
+      var currentPower = 0;
+      var totalPulses = 0;
 
       const dow = ["ZERO","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
       const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -218,15 +232,27 @@
         topic = "Rix/ADU";
         document.getElementById("mess").innerHTML = "Subscribing to topic " + topic;
         client.subscribe(topic);
-        changeTo("Months");
-        document.getElementById("Months").style.backgroundColor = "rgba(0, 220, 0, 0.6)";
+        document.getElementById("fastBack").style.backgroundColor = color0;
+        document.getElementById("Back").style.backgroundColor = color0;
+        document.getElementById("Fwd").style.backgroundColor = color0;
+        document.getElementById("fastFwd").style.backgroundColor = color0;
+        document.getElementById("Cost").style.backgroundColor = color1;
+        document.getElementById("Kwh").style.backgroundColor = color0;
+        var today = new Date();
+        var local = Math.floor(today.getTime() / 1000) - today.getTimezoneOffset() * 60;
+        publishMessage('LocalTime' + local );                // send epoch time ( seconds since start of day 1st Jan 1970 )
+        move('Month');
       }
 
       function startConnect(){
+        document.getElementById('space0').style.visibility = "hidden";
+        document.getElementById('space1').style.visibility = "hidden";
+        document.getElementById('space2').style.visibility = "hidden";
+        document.getElementById('space3').style.visibility = "hidden";
         clientID = "clientID - " + parseInt(Math.random() * 100);
         userId  = "chrono";
         passwordId = "gallifrey";
-        document.getElementById("mess").innerHTML = "Connecting to " + host + ":" + port + " using " + clientID;
+        document.getElementById("mess").innerHTML = " Connecting to " + host + ":" + port + " using " + clientID;
         client = new Paho.MQTT.Client(host,Number(port),clientID);
         client.onFailure = onFailure;
         client.onConnectionLost = onConnectionLost;
@@ -239,115 +265,128 @@
       }
 
       function onFailure(message) {
-        console.log("Connection Attempt to Host " + host + "Failed");
-        document.getElementById("mess").innerHTML = "ERROR:" + message;
+        console.log(" Connection Attempt to Host " + host + "Failed");
+        document.getElementById("mess").innerHTML = " ERROR:" + message;
       }
 
       function onConnectionLost(responseObject) {
-        document.getElementById("mess").innerHTML = "ERROR: Connection is lost";
+        document.getElementById("mess").innerHTML = " ERROR: Connection is lost";
         if ( responseObject !=0 ) {
           document.getElementById("mess").innerHTML = "ERROR:" + responseObject.errorMessage;
         }
       }
 
+      function getThisDayPrice() {
+        var result = 0;
+        for ( var i = 0; i < price.length; i++ )
+          if ( price[ i ].day <= viewDay )
+            result = i;
+        return result
+      }
+
+      function removeData(chart) {
+        for ( let i = chart.data.labels.length; i > 1; i-- )
+          {
+            chart.data.labels.pop();
+            chart.data.datasets[0].data.pop();
+            chart.data.datasets[1].data.pop();
+            chart.data.datasets[2].data.pop();
+          }
+        chart.update();
+      }
+
       function onMessageArrived(message) {
-        console.log("OnMessageArrived: " + message.payloadString);
+        console.log(" OnMessageArrived: " + message.payloadString);
         var a = message.payloadString;
         if ( a[0] == '{' ) {
           obj = JSON.parse(a);
           if ( typeof obj.D  !== 'undefined' ) {                              // get Date
             var x = obj.D;
+            viewDay = Math.floor( x / 10 );                                   // get simple day from epoch
             dows = dow[ x % 10 ];
-            domi = Math.floor(x / 10) % 100;
-            moi = ( Math.floor(x / 1000) % 100 ) - 1;  if ( moi > 13 ) moi = 14;
-            yri = Math.floor(x / 100000) % 100;
+            domi = Math.floor( x / 10 ) % 100;
+            moi = ( Math.floor( x / 1000 ) % 100 ) - 1;  if ( moi > 13 ) moi = 14;
+            yri = Math.floor( x / 100000 ) % 100;
           }
-          if ( typeof obj.CD  !== 'undefined' ) { datePrice = obj.CD;    }  // get Cost Date ( current price / Kwh )
-          if ( typeof obj.CO  !== 'undefined' ) { offPeakPrice = obj.CO; }  // get Cost Off Peak ( current price / Kwh )
-          if ( typeof obj.CP  !== 'undefined' ) { peakPrice = obj.CP;    }  // get Cost Peak ( current price / Kwh )
-
-          for (const key in obj) {
-            if ( typeof key == "string" ) {                               // get bar graph data
-              if ( key.length > 1 )
-                {
-                  n = key.slice(1); // get number after 1st character
-                  if ( key[0] == "H" )                                            // Hours
+          if ( typeof obj.M  !== 'undefined' ) {                              // get Current Load 'updated every minute'
+            currentPower = obj.M * 60 / 800;
+          }
+          if ( typeof obj.T  !== 'undefined' ) {                              // get Total Pulses since 2024/1/1
+            totalPulses = obj.T / 800;
+          }
+          if ( typeof obj.End  !== 'undefined' ) {                            // get End
+            if ( obj.End == "Day" || obj.End == "Month" )
+              {
+                updateButtons();
+                showTotals();
+              }
+            }
+          else
+            {
+              for (const key in obj) {
+                if ( typeof key == "string" ) {                               // get bar graph data
+                  if ( key.length > 1 )
                     {
-                      if ( n == 0 ) offPeakDayUse = peakDayUse = 0;
-                      if ( n < 16 || n > 20 )
+                      n = key.slice(1); // get number after 1st character
+                      if ( n == 0 )
                         {
-                          data.datasets[0].data[n] = obj[key] / 800;
-                          data.datasets[1].data[n] = 0;
-                          offPeakDayUse += obj[key] / 800;
+                          removeData(myChart);
                         }
-                      else
+                      priceOP[n] = price[getThisDayPrice()].op
+                      pricePP[n] = price[getThisDayPrice()].pp
+                      pricePK[n] = price[getThisDayPrice()].pk
+                      var usedKwh = obj[key] / 800;                               // viewDay
+                      if ( key[0] == "H" )                                        // Day
                         {
-                          data.datasets[0].data[n] = 0;
-                          data.datasets[1].data[n] = obj[key] / 800;
-                          peakDayUse += obj[key] / 800;
+                          btn = 'Day';                                                          //   if day is today, do not execute this code for future hours.
+                          data.datasets[0].data[n] = ( n < 15 )            ? usedKwh : 0;
+                          data.datasets[1].data[n] = ( n == 15 || n > 20 ) ? usedKwh : 0;
+                          data.datasets[2].data[n] = ( n > 15  && n < 21 ) ? usedKwh : 0;
+                          if ( n < 15 )
+                            {
+                              UsedOP += usedKwh;
+                              CostOP += usedKwh * priceOP[n];
+                            }
+                          if ( n == 15 || n > 20 )
+                            {
+                              UsedPP += usedKwh;
+                              CostPP += usedKwh * pricePP[n];
+                            }
+                          if ( n > 15 && n < 21 )
+                            {
+                              UsedPK += usedKwh;
+                              CostPK += usedKwh * pricePK[n];
+                            }
+                          data.labels[n] = ( ( n > 9 ) ? ' ' : '   ' ) + n;
                         }
-                      data.labels[n] = n;
-                      if ( n == 23 )
+                      else if ( key[0] == "O" || key[0] == 'A' || key[0] == "P" )                      // Month
                         {
-                          dayUse = offPeakDayUse + peakDayUse;              // get total Kwh for day
-                          dayOffPeakCost = offPeakDayUse * offPeakPrice;    // get off peak cost for day
-                          dayPeakCost = peakDayUse * peakPrice;             // get peak cost for day
-                          dayCost = dayOffPeakCost + dayPeakCost;           // get total cost for
-                        }
-                    }
-                  else if ( key[0] == "O" || key[0] == "P" )                      // Days
-                    {
-                      if ( key[0] == "O" )
-                        data.datasets[0].data[n] = obj[key] / 800;
-                      else
-                        data.datasets[1].data[n] = obj[key] / 800;
-                      data.labels[n] = dows.slice(0,3) + " " + domi + " " + month[ moi ].slice(0,3) + ( ( yri < 10 ) ? ' 0' : ' ' ) + yri;
-                    }
-                  else if ( key[0] == "o" || key[0] == "p" )                      // Months
-                    {
-                      if ( key[0] == "o" )
-                        data.datasets[0].data[n] = obj[key] / 800;
-                      else
-                        data.datasets[1].data[n] = obj[key] / 800;
-                      data.labels[n] = month[ moi ].slice(0,3) + ( ( yri < 10 ) ? " 200" : " 20" ) + yri;
-                    }
-                  if ( n == 0 )
-                    {
-                      var myTable = document.getElementById('dayHr');
-                      if ( btn == "Hours")
-                        {
-                          //document.getElementById("mess").innerText = "$" + offPeakPrice.toFixed(3) + "/Kwh   $" + peakPrice.toFixed(3) + "/Kwh";
-                          //document.getElementById("mess").style.textAlign = "center";
-                          //document.getElementById("mess").style.webkitTextFillColor = "blue";
-                          myTable.rows[0].cells[0].style.textAlign = "left";
-                          dayText = dows.slice(0,3) + ' ' + domi + ' ' + month[ moi ].slice(0,3) + ' ' + yri;
-                          myTable.rows[0].cells[0].innerHTML = dayText;
-                          myTable.rows[0].cells[3].innerHTML = 'Kwh';
-                          //document.getElementById("mess").innerHTML = ourText;
-                       }
-                      else if ( btn == "Days")
-                        {
-                          document.getElementById("mess").innerText = " ";
-                          myTable.rows[0].cells[0].style.textAlign = "center";
-                          myTable.rows[0].cells[0].innerHTML = 'Day';
-                          myTable.rows[0].cells[3].innerHTML = 'Total';
-                        }
-                      else
-                        {
-                          document.getElementById("mess").innerText = " ";
-                          myTable.rows[0].cells[0].style.textAlign = "center";
-                          myTable.rows[0].cells[0].innerHTML = 'Month';
-                          myTable.rows[0].cells[1].style.backgroundColor = 'rgba(0, 220, 0, 0.6)'; // sort of green
-                          myTable.rows[0].cells[2].style.backgroundColor = 'rgba(220, 0, 0, 0.6)'; // sort of red
-                          myTable.rows[0].cells[3].innerHTML = 'Total';
+                          btn = 'Month';
+                          if ( key[0] == "O" )
+                            {
+                              data.datasets[0].data[n] = usedKwh;
+                              UsedOP += usedKwh;
+                              CostOP += usedKwh * priceOP[n];
+                            }
+                          if ( key[0] == 'A' )
+                            {
+                              data.datasets[1].data[n] = usedKwh;
+                              UsedPP += usedKwh;
+                              CostPP += usedKwh * pricePP[n];
+                            }
+                          if ( key[0] == 'P' )
+                            {
+                              data.datasets[2].data[n] = usedKwh;
+                              UsedPK += usedKwh;
+                              CostPK += usedKwh * pricePK[n];
+                            }
+                          data.labels[n] = ( ( domi > 9 ) ? ' ' : '   ' ) + domi + '   ' + dows.slice(0,3);
                         }
                     }
                   }
-              }
-          }
-          //if ( typeof obj.H6 !== 'undefined' ) data.datasets[0].data[6] = obj.H6;
+                }
+            }
         }
-        //document.getElementById("mess").innerHTML = "Topic:" + message.destinationName + "| Message : " + a;
         myChart.update();
       }
 
@@ -357,84 +396,102 @@
       }
 
       function publishMessage(msg) {
-        // msg = document.getElementById("Message").value;
         Message = new Paho.MQTT.Message(msg);
         Message.destinationName = "Rix/ADU";
         client.send(Message);
-        // document.getElementById("mess").innerHTML = "Message to topic Rix/ADU is sent " + msg;
       }
 
-      function changeTo(b) {
-          d = new Date();
-          local = Math.floor(d.getTime() / 1000) - d.getTimezoneOffset() * 60;
-          publishMessage("LocalTime" + local ); // send seconds since start of day 1st Jan 1970
-          document.getElementById("Months").style.backgroundColor = (b == "Months")?"rgba(0, 220, 0, 0.6)":"#bfb";
-          document.getElementById("Days").style.backgroundColor = (b == "Days")?"rgba(0, 220, 0, 0.6)":"#bfb";
-          document.getElementById("Hours").style.backgroundColor = (b == "Hours")?"rgba(0, 220, 0, 0.6)":"#bfb";
-          if(b == "Months") { publishMessage("Months0"); back = 0; document.getElementById('Cost').style.visibility = 'visible'; }
-          if(b == "Days") { publishMessage("Days0"); back = 0; document.getElementById('Cost').style.visibility = 'visible'; }
-          if(b == "Hours")
+      function updateButtons() {
+          document.getElementById("Month").style.backgroundColor = ( btn == "Month" ) ? color1 : color0;
+          document.getElementById("Day").style.backgroundColor = ( btn == "Day" ) ? color1 : color0;
+          var myTable = document.getElementById('dayHr');
+          myTable.rows[0].cells[1].style.backgroundColor = color1; // sort of green
+          myTable.rows[0].cells[2].style.backgroundColor = color2; // sort of yellow
+          myTable.rows[0].cells[3].style.backgroundColor = color3; // sort of red
+          myTable.rows[0].cells[4].style.backgroundColor = 'rgba(10, 255, 255, 0.6)'; // sort of cyan
+          if ( btn == "Day")
             {
-              publishMessage("Hours0");
-              back = 0;
-              document.getElementById('Cost').style.visibility = 'hidden';
-              cost = true;
-              document.getElementById("Cost").innerHTML = ( cost ) ? "Kwh" : "$$$";
+              document.getElementById("mess").innerText = ' ' + dows + ' '.repeat(6) + 'Load ' + currentPower.toFixed(2) + ' Kw  Total ' + totalPulses.toFixed(2) + ' Kwh';
+              myTable.rows[0].cells[0].innerText = domi + ' ' + month[ moi ].slice(0,3) + ' ' + yri;
             }
-          btn = b;
-          // document.getElementById("mess").innerHTML = "You pressed the " + b + " button";
+          if ( btn == "Month" )
+            {
+              document.getElementById("mess").innerText = ' ' + ( ( yri < 10 ) ? ' 200' : ' 20' ) + yri + ' '.repeat(7) + 'Load ' + currentPower.toFixed(2) + ' Kw  Total ' + totalPulses.toFixed(2) + ' Kwh';
+              myTable.rows[0].cells[0].innerText = month[ moi ];
+            }
       }
 
       function move(v) {
+        if ( v == 'Month' || v == 'Day' ) { btn = v; back = v = 0; }
         back += v;
         if ( back < 0 ) back = 0;
-        if ( btn == 'Months' )
+        if ( btn == 'Month' )
           {
-            if ( back > 18 )      // limit to 20 years including this year and last year
-              back = 18;
+            if ( back > 119 ) back = 119    // 120 months = 10 years
           }
-        if ( btn == 'Days' )
+        if ( btn == 'Day' )
           {
-            if ( back > 304 )     // 304 * 24 + 23 = 7319
-              back = 304;         // 20 * 366 = 7320 = size of day buffer ( over 20 years )
+            if ( back > 71 ) back = 71;     // limit to 72 days including today
           }
-        if ( btn == 'Hours' )
-          {
-            if ( back > 61 )      // limit to 62 days including today
-              back = 61;
-          }
+        updateButtons();
         publishMessage( btn + back );
+        UsedOP = UsedPP = UsedPK = CostOP = CostPP = CostPK = 0;
       }
 
-      function make() {
-        cost = !cost;
-        document.getElementById("Cost").innerHTML = ( cost ) ? "Kwh" : "$$$";
+      function showTotals() {
+        var myTable = document.getElementById('Totals');
+        myTable.rows[0].cells[0].style.backgroundColor = 'rgba(10, 255, 255, 0.6)'; // sort of teal
+        myTable.rows[0].cells[1].style.backgroundColor = color1; // sort of green
+        myTable.rows[0].cells[2].style.backgroundColor = color2; // sort of yellow
+        myTable.rows[0].cells[3].style.backgroundColor = color3; // sort of red
+        myTable.rows[0].cells[4].style.backgroundColor = 'rgba(10, 255, 255, 0.6)'; // sort of cyan
+
+        myTable.rows[0].cells[0].innerText = ' Totals';
+        myTable.rows[0].cells[1].innerHTML = ( dollar ) ? CostOP.toFixed(2) : UsedOP.toFixed(2);
+        myTable.rows[0].cells[2].innerHTML = ( dollar ) ? CostPP.toFixed(2) : UsedPP.toFixed(2);
+        myTable.rows[0].cells[3].innerHTML = ( dollar ) ? CostPK.toFixed(2) : UsedPK.toFixed(2);
+        var UsedTotal = UsedOP + UsedPP + UsedPK;                           // get total Kwh
+        var CostTotal = CostOP + CostPP + CostPK;                           // get total cost
+        myTable.rows[0].cells[4].innerHTML = ( dollar ) ? CostTotal.toFixed(2) : UsedTotal.toFixed(2);
         myChart.update();
       }
 
-      // setup
-      data = {
+      function make(b) {        var UsedTotal = UsedOP + UsedPP + UsedPK;                           // get total Kwh
+
+        dollar = ( b == 'Cost' );
+        document.getElementById("Cost").style.backgroundColor = dollar?color1:color0;
+        document.getElementById("Kwh").style.backgroundColor = !dollar?color1:color0;
+        showTotals();
+      }
+
+      data = {                // setup
         labels: [],
         datasets: [
           {
-          label: 'Off Peak ',
+          label: 'Off ',
           data: [],
-          backgroundColor: this.fill = ( 'rgba(0, 220, 0, 0.6)' ),
-          borderColor: this.fill = ( 'rgba(0, 240, 0, 1)' ),
+          backgroundColor: this.fill = color1,
+          borderColor: this.fill = color1,
+          borderWidth: 2
+          },
+          {
+          label: 'Partial ',
+          data: [],
+          backgroundColor: this.fill = color2,
+          borderColor: this.fill = color2,
           borderWidth: 2
           },
           {
           label: 'Peak ',
           data: [],
-          backgroundColor: this.fill = ( 'rgba(220, 0, 0, 0.6)' ),
-          borderColor: this.fill = ( 'rgba(240, 0, 0, 1)' ),
+          backgroundColor: this.fill = color3,
+          borderColor: this.fill = color3,
           borderWidth: 2
           },
         ]
       };
 
-      // innerBarText plugin block
-      innerBar = {
+      innerBar = {                  // innerBarText plugin block
         id: 'innerBar',
         afterDatasetsDraw(chart, args, pluginOptions) {
           const { ctx, data, chartArea: { left }, scales: { x, y } } = chart;
@@ -443,40 +500,50 @@
           data.datasets[0].data.forEach((dataPoint, index) => {
             ctx.font = '18px sans-serif';
             ctx.fillStyle = 'black';
-            let o = dataPoint;                      // offPeak
-            let co = dataPoint * offPeakPrice;      // costOffPeak
-            let p = data.datasets[1].data[index];   // peak
-            let cp = p * peakPrice;                 // costPeak
-            let tk = o + p;                         // total Kwh = offPeak + peak
-            let tc = co + cp;                       // total Cost = CostOffPeak + CostPeak
+            let o = dataPoint;                      // Off peak
+            if ( !o ) o = 0;                        // ensure o is a number
+            if ( dollar ) o *= priceOP[ index ];    // Cost Off peak
+
+            let a = data.datasets[1].data[index];   // pArtial peak
+            if ( !a ) a = 0;                        // ensure a is a number
+            if ( dollar ) a *= pricePP[ index ];    // Cost pArtial eak
+
+            let p = data.datasets[2].data[index];   // Peak
+            if ( !p ) p = 0;                        // ensure p is a number
+            if ( dollar ) p *= pricePK[ index ];    // Cost Peak
+
+            let t = o + a + p;                     // total Kwh or Cost = OffPeak + pArtial peak + Peak
+
             ctx.fillText(`${data.labels[ index ]}`, left + 5, y.getPixelForValue(index) + 6 );
-            if ( co )
+            if ( o )
               {
-                if ( cost )
-                  ctx.fillText(`$${co.toFixed(2)}`, window.innerWidth * 0.35, y.getPixelForValue(index) + 6 );
-                else
-                  ctx.fillText(`${o.toFixed(2)}`, window.innerWidth * 0.35, y.getPixelForValue(index) + 6 );
+                ctx.fillText(`${o.toFixed(2)}`, window.innerWidth * 0.31 - 17, y.getPixelForValue(index) + 6 );
+              }
+            if ( a )
+              {
+                ctx.fillText(`${a.toFixed(2)}`, window.innerWidth * 0.49 - 16, y.getPixelForValue(index) + 6 );
               }
             if ( p )
               {
-                if ( cost )
-                  ctx.fillText(`$${cp.toFixed(2)}`, window.innerWidth * 0.55, y.getPixelForValue(index) + 6 );
-                else
-                  ctx.fillText(`${p.toFixed(2)}`, window.innerWidth * 0.55, y.getPixelForValue(index) + 6 );
+                ctx.fillText(`${p.toFixed(2)}`, window.innerWidth * 0.67 - 14, y.getPixelForValue(index) + 6 );
               }
-            if ( p && o )
+            if ( ( o || a || p ) && btn == 'Month' )
               {
-                if ( cost )
-                  ctx.fillText(`$${tc.toFixed(2)}`, window.innerWidth * 0.75, y.getPixelForValue(index) + 6 );
-                else
-                  ctx.fillText(`${tk.toFixed(2)}`, window.innerWidth * 0.75, y.getPixelForValue(index) + 6 );
+                ctx.fillText(`${t.toFixed(2)}`, window.innerWidth * 0.85 - 13, y.getPixelForValue(index) + 6 );
               }
-            if ( btn == 'Hours' && tk )
-              ctx.fillText(`${tk.toFixed(2)}`, window.innerWidth * 0.75, y.getPixelForValue(index) + 6 );
             } )
       }
     }
-    const PGE = () => { return [ ' ', 'Off Peak $' + offPeakPrice + '/Kwh', ' ', ' Peak  $' + peakPrice + '/Kwh']; };
+
+    const PGE = (tooltipItems) => {
+      tooltipItems.forEach(function(tooltipItem) {
+        var y = tooltipItem.parsed.y
+        let sumOP = priceOP[y];
+        let sumPP = pricePP[y];
+        let sumPK = pricePK[y];
+      });
+      return [ ' \xa0___________________', 'Off $ ' + sumOP + ' / Kwh', 'Partial $ ' + sumPP + ' / Kwh', ' \xa0 \xa0 Peak  $ ' + sumPK + ' / Kwh' ];
+    };
 
     const config = {        // config 
       type: 'bar',
@@ -488,13 +555,19 @@
           legend: false, // Hide legend
           tooltip: {
             callbacks: {
-              footer: PGE,
+              label: function(tooltipItem, data) {
+                let y = tooltipItem.dataIndex;
+                let text = tooltipItem.datasetIndex === 0 ? priceOP[y] : tooltipItem.datasetIndex === 1 ? pricePP[y] : pricePK[y];
+                return [ ' ' + `${tooltipItem.formattedValue}` + ' Kwh', 'at $ ' + text + ' / Kwh' ]
+              } //,
+              // footer: PGE,
             }
           }
         },
         scales: {
           x:  {
                 stacked: true,
+                display: false
               },
           y:  {
                 stacked: true,
@@ -505,14 +578,12 @@
       plugins: [innerBar]
     };
 
-    // render init block
-    const myChart = new Chart(
+    let myChart = new Chart(                    // render init block
       document.getElementById('myChart'),
       config
     );
 
-    // Instantly assign Chart.js version
-    const chartVersion = document.getElementById('chartVersion');
+    const chartVersion = document.getElementById('chartVersion');    // Instantly assign Chart.js version
     //chartVersion.innerText = Chart.version;
 
     window.onload = function () { 
