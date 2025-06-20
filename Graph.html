@@ -515,22 +515,18 @@
             let t = o + a + p;                     // total Kwh or Cost = OffPeak + pArtial peak + Peak
 
             ctx.fillText(`${data.labels[ index ]}`, left + 5, y.getPixelForValue(index) + 6 );
+            
             if ( o )
-              {
-                ctx.fillText(`${o.toFixed(2)}`, window.innerWidth * 0.31 - 17, y.getPixelForValue(index) + 6 );
-              }
+              ctx.fillText(`${o.toFixed(2)}`, window.innerWidth * 0.31 - 17, y.getPixelForValue(index) + 6 );
+            
             if ( a )
-              {
-                ctx.fillText(`${a.toFixed(2)}`, window.innerWidth * 0.49 - 16, y.getPixelForValue(index) + 6 );
-              }
+              ctx.fillText(`${a.toFixed(2)}`, window.innerWidth * 0.49 - 16, y.getPixelForValue(index) + 6 );
+            
             if ( p )
-              {
-                ctx.fillText(`${p.toFixed(2)}`, window.innerWidth * 0.67 - 14, y.getPixelForValue(index) + 6 );
-              }
+              ctx.fillText(`${p.toFixed(2)}`, window.innerWidth * 0.67 - 14, y.getPixelForValue(index) + 6 );
+            
             if ( ( o || a || p ) && btn == 'Month' )
-              {
-                ctx.fillText(`${t.toFixed(2)}`, window.innerWidth * 0.85 - 13, y.getPixelForValue(index) + 6 );
-              }
+              ctx.fillText(`${t.toFixed(2)}`, window.innerWidth * 0.85 - 13, y.getPixelForValue(index) + 6 );
             } )
       }
     }
