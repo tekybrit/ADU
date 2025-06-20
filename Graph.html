@@ -538,11 +538,8 @@
     const PGE = (tooltipItems) => {
       tooltipItems.forEach(function(tooltipItem) {
         var y = tooltipItem.parsed.y
-        let sumOP = priceOP[y];
-        let sumPP = pricePP[y];
-        let sumPK = pricePK[y];
       });
-      return [ ' \xa0___________________', 'Off $ ' + sumOP + ' / Kwh', 'Partial $ ' + sumPP + ' / Kwh', ' \xa0 \xa0 Peak  $ ' + sumPK + ' / Kwh' ];
+      return [ ' \xa0___________________', 'Off $ ' + priceOP[y] + ' / Kwh', 'Partial $ ' + pricePP[y] + ' / Kwh', ' \xa0 \xa0 Peak  $ ' + pricePK[y] + ' / Kwh' ];
     };
 
     const config = {        // config 
